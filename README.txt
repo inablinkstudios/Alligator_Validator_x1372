@@ -1,0 +1,7 @@
+This repository contains documentation and files for the X1 Validator 372 [Alligator_Validator].
+
+Log
+----------
+2024-jan-31: Built and deployed "GAS" branch.
+2024-jan-31: snapshot downloaded 1600.
+2024-feb-01: bad block caused error for consensus to occur. waiting for instruction. 
