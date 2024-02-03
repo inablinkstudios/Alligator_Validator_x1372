@@ -34,13 +34,14 @@ git pull && git checkout test_1_1_4
 
 #Build a new x1 
 make x1
+ go mod tidy
 
 #Copy to usr local bin
 cp build/x1 /usr/local/bin/
 
 #Step 4 - Restart X1 Node#
 #Restart the node
-nohup x1 --testnet --xenblocks-endpoint ws://xenblocks.io:6668 --gcmode full --syncmode full --exitwhensynced.epoch 1700 --cache 7863 
+nohup x1 --testnet --xenblocks-endpoint ws://xenblocks.io:6668 --gcmode full --syncmode full --exitwhensynced.epoch 1700 --cache 7863 &
 
 #Done. Your validator is running in read-only mode.
 
@@ -53,8 +54,12 @@ nohup x1 --testnet --validator.id 372 --validator.pubkey 0xc00477783f8e7faaa64d0
 nohup x1 --testnet --xenblocks-endpoint ws://xenblocks.io:6668 --gcmode full --syncmode full --exitwhensynced.epoch 1700 --cache 7863 &
 
 
+nohup x1 --testnet --xenblocks-endpoint ws://xenblocks.io:6668 --gcmode full --syncmode full --cache 7863 &
+
 #heal the database when needed - !need example from logs 
 x1 db heal --experimental
+
+
 
 
 #Logs from nohup.out
