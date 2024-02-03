@@ -1,0 +1,70 @@
+
+#This is the launch command for x1Edge without validator ID
+x1 --testnet --syncmode snap --xenblocks-endpoint ws://xenblocks.io:6668 --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts "*" --http.corsdomain "*" --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins "*" --cache 7863
+
+
+#This is the launch command for x1Edge with a validator ID [validator#: 372]
+x1 --testnet --validator.id 372 --validator.pubkey 0xc00477783f8e7faaa64d02f0b50f8b4e63055cec879a54ad07e11784ae96a08619579473881709da38015a8bc82a2cfeae38ce4f78407ede88484ed2fc9e3f7b7c16 --validator.password ~/.x1/.password --syncmode snap --xenblocks-endpoint ws://xenblocks.io:6668 --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts "*" --http.corsdomain "*" --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins "*" --cache 7863
+
+
+#This is the launch command for x1Edge with validator ID and logs in the nohup
+nohup x1 --testnet --validator.id 372 --validator.pubkey 0xc00477783f8e7faaa64d02f0b50f8b4e63055cec879a54ad07e11784ae96a08619579473881709da38015a8bc82a2cfeae38ce4f78407ede88484ed2fc9e3f7b7c16 --validator.password ~/.x1/.password --syncmode snap --xenblocks-endpoint ws://xenblocks.io:6668 --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts "*" --http.corsdomain "*" --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins "*" --cache 7863 & 
+
+#This is the launch command for x1Edge as of Jan 30 2024
+nohup x1 --testnet --validator.id 372 --validator.pubkey 0xc00477783f8e7faaa64d02f0b50f8b4e63055cec879a54ad07e11784ae96a08619579473881709da38015a8bc82a2cfeae38ce4f78407ede88484ed2fc9e3f7b7c16 --validator.password ~/.x1/.password --syncmode full --xenblocks-endpoint ws://xenblocks.io:6668 --cache 7863 & 
+
+#This is the launch sequence as of Feb 2 2024
+#Step 1 - Stop your validator#
+ps aux | grep  x1
+kill 58582
+
+#Step 2 - Remove and replace chain data#
+#From home directory remove chaindata and go-x1 folders
+rm -rf .x1/chaindata .x1/go-x1
+
+#Unpack downloaded tar of block data
+tar -xvf ~/chaindata1600.tar -C /root/.x1/
+
+#Step 3 - Rebuild X1#
+#Go to go-x1 folder
+cd /root/go-x1
+
+#Get new files from repository and switch to the correct branch (test_1_1_4 at the time of writing)
+git pull && git checkout test_1_1_4
+
+#Build a new x1 
+make x1
+
+#Copy to usr local bin
+cp build/x1 /usr/local/bin/
+
+#Step 4 - Restart X1 Node#
+#Restart the node
+nohup x1 --testnet --xenblocks-endpoint ws://xenblocks.io:6668 --gcmode full --syncmode full --exitwhensynced.epoch 1700 --cache 7863 
+
+#Done. Your validator is running in read-only mode.
+
+#Other Stuff#
+nohup x1 --testnet --validator.id 372 --validator.pubkey 0xc00477783f8e7faaa64d02f0b50f8b4e63055cec879a54ad07e11784ae96a08619579473881709da38015a8bc82a2cfeae38ce4f78407ede88484ed2fc9e3f7b7c16 --validator.password ~/.x1/.password --xenblocks-endpoint ws://xenblocks.io:6668 --cache 7863 --gcmode full --syncmode full  --exitwhensynced.epoch 1700 &
+
+
+nohup x1 --testnet --validator.id 372 --validator.pubkey 0xc00477783f8e7faaa64d02f0b50f8b4e63055cec879a54ad07e11784ae96a08619579473881709da38015a8bc82a2cfeae38ce4f78407ede88484ed2fc9e3f7b7c16 --validator.password ~/.x1/.password --xenblocks-endpoint ws://xenblocks.io:6668 --cache 7863 --gcmode full --syncmode full &
+
+nohup x1 --testnet --xenblocks-endpoint ws://xenblocks.io:6668 --gcmode full --syncmode full --exitwhensynced.epoch 1700 --cache 7863 &
+
+
+#heal the database when needed - !need example from logs 
+x1 db heal --experimental
+
+
+#Logs from nohup.out
+
+cat nohup.out | grep ERROR && tail -f nohup.out | grep ERROR 
+cat nohup.out | grep WARN && tail -f nohup.out | grep WARN 
+cat nohup.out | grep Gas && tail -f nohup.out | grep Gas
+cat nohup.out | grep "New block" && tail -f nohup.out | grep "New block"
+cat nohup.out | grep LLR && tail -f nohup.out | grep LLR
+cat nohup.out | grep DAG && tail -f nohup.out | grep DAG
+
+
+
